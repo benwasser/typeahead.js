@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<meta name="viewport" id="vp" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width" />
+	<style>
+		* { font-family: sans-serif; }
+		label { display: block; font-weight: bold; color: #505050; margin: 3px; }
+		input { border: 1px solid #ddd; border-radius: 2px; height: 20px; width: 250px; text-indent: 4px; }
+		small { color: #c1c1c1; }
+		@-ms-viewport {
+			width: device-width;
+		}
+		.tt-hint {
+		    color: #999999;
+		}
+		.tt-dropdown-menu {
+		    background-color: #FFFFFF;
+		    border: 1px solid rgba(0, 0, 0, 0.2);
+		    border-radius: 0 0 4px 4px;
+		    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+		    margin-top: 0px;
+		    padding: 0 0 4px 0;
+		    width: 100%;
+			max-height: 150px;
+			overflow-y: auto;
+			overflow-x: hidden;
+		}
+		.tt-suggestion {
+			font-size: 14px;
+			padding: 5px;
+			cursor: pointer;
+			border-bottom:1px solid #d4d3d5;
+		}
+		.tt-suggestion.tt-cursor {
+		    background-color: #0097CF;
+		    color: #FFFFFF;
+		}
+		.tt-suggestion p {
+		    margin: 0;
+		}
+		.tt-suggestion-category {
+			background-color:#444444;
+			padding:5px;
+			font-size:10px;
+			color:#f1eff2;
+			margin:0px;
+		}
+		.tt-suggestion-category p {
+			margin:0px;
+		}
+	</style>
+</head>
+<body>
+	<div id="console"></div>
+	<div style="height:250px"></div>
+	<div style="width:140px;height:10px;display:inline-block;"></div>
+	<input id="test-input-1" type="text">
+	<div style="height:2300px"></div>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="dist/typeahead.bundle.js"></script>
+	<script>
+
+		var substringMatcher = function(items) {
+			return function findMatches(q, callback) {
+				var matches, substringRegex;
+				matches = [];
+				substrRegex = new RegExp(q, 'i');
+				$.each(items, function(i, item) {
+					if (substrRegex.test(item.value)) {
+						matches.push(item);
+					}
+				});
+				callback(matches);
+			};
+		};
+
+		var itemsAndSubItems = [
+			{value:'test1', category:'Category 1'},
+			{value:'test2', category:'Category 1'},
+			{value:'test3', category:'Category 1'},
+			{value:'test4', category:'Category 2'},
+			{value:'test5', category:'Category 2'},
+			{value:'test6', category:'Category 2'},
+			{value:'test7', category:'Category 2'},
+			{value:'test8', category:'Category 2'},
+			{value:'test9', category:'Category 2'},
+			{value:'test10', category:'Category 2'},
+			{value:'test11', category:'Category 2'},
+			{value:'test12', category:'Category 2'},
+			{value:'test13', category:'Category 3'},
+			{value:'test14', category:'Category 3'},
+			{value:'test15', category:'Category 3'},
+			{value:'test16', category:'Category 3'},
+			{value:'test17', category:'Category 3'},
+			{value:'test18', category:'Category 3'},
+			{value:'test19', category:'Category 3'},
+			{value:'test20', category:'Category 3'},
+			{value:'test21', category:'Category 3'},
+			{value:'test22', category:'Category 3'},
+			{value:'test23', category:'Category 3'},
+			{value:'test24', category:'Category 3'},
+			{value:'test25', category:'Category 4'},
+			{value:'test26', category:'Category 4'},
+			{value:'test27', category:'Category 4'},
+			{value:'test28', category:'Category 4'},
+			{value:'test29', category:'Category 4'},
+			{value:'test30', category:'Category 4'},
+		];
+
+		$('#test-input-1').typeahead({
+			hint: true,
+			highlight: true,
+			minLength: 0
+		},{
+			name: 'items',
+			displayKey: 'value',
+			displayCategory: 'category',
+			source: substringMatcher(itemsAndSubItems)
+		});
+
+	</script>
+</body>
+</html>
+

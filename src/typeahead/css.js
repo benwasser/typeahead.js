@@ -54,6 +54,12 @@ var css = (function() {
     rtl: {
       left: 'auto',
       right:' 0'
+    },
+    sticky: {
+      position: 'fixed',
+      top: '0px',
+      width:'100%',
+      '-webkit-transform': 'translate3d(0,0,0)'
     }
   };
 

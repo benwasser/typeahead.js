@@ -1,7 +1,7 @@
 /*!
  * typeahead.js 0.10.5
  * https://github.com/twitter/typeahead.js
- * Copyright 2013-2014 Twitter, Inc. and other contributors; Licensed MIT
+ * Copyright 2013-2015 Twitter, Inc. and other contributors; Licensed MIT
  */
 
 (function($) {
@@ -129,7 +129,7 @@
     var html = function() {
         return {
             wrapper: '<span class="twitter-typeahead"></span>',
-            dropdown: '<span class="tt-dropdown-menu"></span>',
+            dropdown: '<span class="tt-dropdown-menu" data-smooth-scrolling="off"></span>',
             dataset: '<div class="tt-dataset-%CLASS%"></div>',
             suggestions: '<span class="tt-suggestions"></span>',
             suggestion: '<div class="tt-suggestion"></div>'
@@ -183,6 +183,12 @@
             rtl: {
                 left: "auto",
                 right: " 0"
+            },
+            sticky: {
+                position: "fixed",
+                top: "0px",
+                width: "100%",
+                "-webkit-transform": "translate3d(0,0,0)"
             }
         };
         if (_.isMsie()) {
@@ -700,7 +706,7 @@
                 return "<p>" + displayFn(context) + "</p>";
             }
             function categoryHeaderTemplate(name) {
-                return '<p class="tt-suggestion-category">' + name + "</p>";
+                return '<p class="tt-suggestion-category" data-tt-enum="' + _.getUniqueId() + '">' + name + "</p>";
             }
         }
         function isValidName(str) {
@@ -899,6 +905,12 @@
             $menu.on("mousedown.tt", function($e) {
                 $e.preventDefault();
             });
+            $menu.scroll(this._categoryHeaderMovement);
+            $menu.on("scroll mousewheel", this._categoryHeaderMovement);
+            var that = this;
+            $(window).scroll(function() {
+                that._categoryHeaderMovement();
+            });
             this.eventBus = o.eventBus || new EventBus({
                 el: $input
             });
@@ -933,6 +945,10 @@
             },
             _onOpened: function onOpened() {
                 this._updateHint();
+                var query = "";
+                this.dropdown.isEmpty && query.length >= this.minLength ? this.dropdown.update(query) : this.dropdown.moveCursorDown();
+                this.dropdown.open();
+                this._categoryHeaderMovement();
                 this.eventBus.trigger("opened");
             },
             _onClosed: function onClosed() {
@@ -944,6 +960,10 @@
                 this.dropdown.open();
             },
             _onBlurred: function onBlurred() {
+                var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
+                if ($dropdown.find(".tt-sticky").length) {
+                    $dropdown.find(".tt-sticky").remove();
+                }
                 this.isActivated = false;
                 this.dropdown.empty();
                 this.dropdown.close();
@@ -988,6 +1008,53 @@
             },
             _onRightKeyed: function onRightKeyed() {
                 this.dir === "ltr" && this._autocomplete();
+            },
+            _categoryHeaderMovement: function categoryHeaderMovement() {
+                var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
+                if ($dropdown.find(".tt-sticky").length) {
+                    if ($dropdown.find(".tt-sticky").css("position") == "fixed") {
+                        var newTop = $dropdown.offset().top - $(window).scrollTop();
+                        $dropdown.find(".tt-sticky").css("top", newTop + "px");
+                    } else {
+                        $dropdown.find(".tt-sticky").css("top", $dropdown.scrollTop() + "px");
+                    }
+                }
+                var lowestPassedElem;
+                var inTransition = false;
+                $dropdown.find(".tt-suggestion-category").each(function(i, elem) {
+                    if (!$(elem).hasClass("tt-sticky")) {
+                        if ($(elem).offset().top < $dropdown.offset().top) {
+                            if (!lowestPassedElem) {
+                                lowestPassedElem = elem;
+                            } else {
+                                if ($(elem).offset().top > $(lowestPassedElem).offset().top) lowestPassedElem = elem;
+                            }
+                        } else if ($(elem).offset().top < $dropdown.offset().top + $dropdown.find(".tt-sticky").outerHeight()) {
+                            if ($dropdown.find(".tt-sticky").length) {
+                                inTransition = true;
+                                $dropdown.find(".tt-sticky").css("position", "absolute");
+                                var newTop = $dropdown.scrollTop() - ($(elem).outerHeight() - ($(elem).offset().top - $dropdown.offset().top));
+                                $dropdown.find(".tt-sticky").css("top", newTop + "px");
+                            }
+                        }
+                    }
+                });
+                if (!lowestPassedElem) {
+                    if ($dropdown.find(".tt-sticky").length) $dropdown.find(".tt-sticky").remove();
+                } else {
+                    if ($dropdown.find(".tt-sticky").length) {
+                        if ($dropdown.find(".tt-sticky").attr("data-tt-enum") != $(lowestPassedElem).attr("data-tt-enum")) {
+                            $dropdown.find(".tt-sticky").remove();
+                            var newTop = $dropdown.offset().top - $(window).scrollTop();
+                            $(lowestPassedElem).clone().removeData().addClass("tt-sticky").css(css.sticky).css("position", "fixed").css("top", newTop + "px").css("width", $(lowestPassedElem).width()).appendTo($dropdown);
+                        } else {
+                            if (!inTransition) $dropdown.find(".tt-sticky").css("position", "fixed");
+                        }
+                    } else {
+                        var newTop = $dropdown.offset().top - $(window).scrollTop();
+                        $(lowestPassedElem).clone().removeData().addClass("tt-sticky").css(css.sticky).css("position", "fixed").css("top", newTop + "px").css("width", $(lowestPassedElem).width()).appendTo($dropdown);
+                    }
+                }
             },
             _onQueryChanged: function onQueryChanged(e, query) {
                 this.input.clearHintIfInvalid();
