@@ -129,6 +129,7 @@ var Typeahead = (function() {
       this.dropdown.open();
       this._categoryHeaderMovement();
       this.eventBus.trigger("opened");
+      this._delayedHeaderUpdate();
     },
 
     _onClosed: function onClosed() {
@@ -140,6 +141,7 @@ var Typeahead = (function() {
     _onFocused: function onFocused() {
       this.isActivated = true;
       this.dropdown.open();
+      this._delayedHeaderUpdate();
     },
 
     _onBlurred: function onBlurred() {
@@ -214,7 +216,12 @@ var Typeahead = (function() {
     _onRightKeyed: function onRightKeyed() {
       this.dir === 'ltr' && this._autocomplete();
     },
-
+    _delayedHeaderUpdate: function delayedHeaderUpdate() {
+        var that = this;
+        setTimeout(function(){
+            that._categoryHeaderMovement();
+        }, 10);
+    },
     _categoryHeaderMovement: function categoryHeaderMovement(){
         var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
         // $dropdown = $('.tt-dropdown-menu');
@@ -244,43 +251,45 @@ var Typeahead = (function() {
                         //set lowest item if it's lower than what is already set:
                         if ($(elem).offset().top > $(lowestPassedElem).offset().top) lowestPassedElem = elem;
                     }
-                } else if ($(elem).offset().top < $dropdown.offset().top + ($dropdown.find('.tt-sticky').outerHeight())) {
+                } else if ($(elem).offset().top < $dropdown.offset().top + $dropdown.find('.tt-sticky').outerHeight()) {
                     //not ready to switch yet but is overlapping:
-                    if ($dropdown.find('.tt-sticky').length) {
-                        inTransition = true;
-                        $dropdown.find('.tt-sticky').css('position', 'absolute');
-                        //figure out new height by computing the top of the element that's pushing it out:
-                        var newTop = $dropdown.scrollTop() - (
-                            $(elem).outerHeight() - (
-                                    $(elem).offset().top - 
-                                    $dropdown.offset().top
-                                )
-                            );
-                        $dropdown.find('.tt-sticky').css('top', newTop + 'px');
-                    }
+                    inTransition = true;
+                    if (lowestPassedElem) $dropdown.find('.tt-sticky').html($(lowestPassedElem).html());
+                    $dropdown.find('.tt-sticky').css('position', 'absolute');
+                    //figure out new height by computing the top of the element that's pushing it out:
+                    var newTop = $dropdown.scrollTop() - (
+                        $(elem).outerHeight() - (
+                                $(elem).offset().top - 
+                                $dropdown.offset().top
+                            )
+                        );
+                    $dropdown.find('.tt-sticky').css('top', newTop + 'px');
                 }
             }
         });
+        // if (inTransition) return;
         if (!lowestPassedElem) {
             //remove stickied header if there are no scrolled-past headers:
             if ($dropdown.find('.tt-sticky').length) $dropdown.find('.tt-sticky').remove();
         } else {
-            //check if stickied header already exists:
-            if ($dropdown.find('.tt-sticky').length) {
-                //check if it's a different element than what is already stickied:
-                if ($dropdown.find('.tt-sticky').attr('data-tt-enum') != $(lowestPassedElem).attr('data-tt-enum')){
-                    //remove existing
-                    $dropdown.find('.tt-sticky').remove();
-                    //clone header and make it the new sticky:
+            if (!inTransition){
+                //check if stickied header already exists:
+                if ($dropdown.find('.tt-sticky').length) {
+                    //check if it's a different element than what is already stickied:
+                    if ($dropdown.find('.tt-sticky').attr('data-tt-enum') != $(lowestPassedElem).attr('data-tt-enum')){
+                        //remove existing
+                        $dropdown.find('.tt-sticky').remove();
+                        //clone header and make it the new sticky:
+                        var newTop = $dropdown.offset().top - $(window).scrollTop();
+                        $(lowestPassedElem).clone().removeData().addClass('tt-sticky').css(css.sticky).css('position', 'fixed').css('top', newTop + 'px').css('width', $(lowestPassedElem).width()).appendTo($dropdown);
+                    } else {
+                        $dropdown.find('.tt-sticky').css('position', 'fixed');
+                    }
+                } else {
+                    //clone header and make it the sticky:
                     var newTop = $dropdown.offset().top - $(window).scrollTop();
                     $(lowestPassedElem).clone().removeData().addClass('tt-sticky').css(css.sticky).css('position', 'fixed').css('top', newTop + 'px').css('width', $(lowestPassedElem).width()).appendTo($dropdown);
-                } else {
-                    if (!inTransition) $dropdown.find('.tt-sticky').css('position', 'fixed');
                 }
-            } else {
-                //clone header and make it the sticky:
-                var newTop = $dropdown.offset().top - $(window).scrollTop();
-                $(lowestPassedElem).clone().removeData().addClass('tt-sticky').css(css.sticky).css('position', 'fixed').css('top', newTop + 'px').css('width', $(lowestPassedElem).width()).appendTo($dropdown);
             }
         }
     },
@@ -294,6 +303,7 @@ var Typeahead = (function() {
 
       this.dropdown.open();
       this._setLanguageDirection();
+      this._delayedHeaderUpdate();
     },
 
     _onWhitespaceChanged: function onWhitespaceChanged() {

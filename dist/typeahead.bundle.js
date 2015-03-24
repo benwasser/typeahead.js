@@ -1548,6 +1548,7 @@
                 this.dropdown.open();
                 this._categoryHeaderMovement();
                 this.eventBus.trigger("opened");
+                this._delayedHeaderUpdate();
             },
             _onClosed: function onClosed() {
                 this.input.clearHint();
@@ -1556,6 +1557,7 @@
             _onFocused: function onFocused() {
                 this.isActivated = true;
                 this.dropdown.open();
+                this._delayedHeaderUpdate();
             },
             _onBlurred: function onBlurred() {
                 var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
@@ -1607,6 +1609,12 @@
             _onRightKeyed: function onRightKeyed() {
                 this.dir === "ltr" && this._autocomplete();
             },
+            _delayedHeaderUpdate: function delayedHeaderUpdate() {
+                var that = this;
+                setTimeout(function() {
+                    that._categoryHeaderMovement();
+                }, 10);
+            },
             _categoryHeaderMovement: function categoryHeaderMovement() {
                 var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
                 if ($dropdown.find(".tt-sticky").length) {
@@ -1628,29 +1636,30 @@
                                 if ($(elem).offset().top > $(lowestPassedElem).offset().top) lowestPassedElem = elem;
                             }
                         } else if ($(elem).offset().top < $dropdown.offset().top + $dropdown.find(".tt-sticky").outerHeight()) {
-                            if ($dropdown.find(".tt-sticky").length) {
-                                inTransition = true;
-                                $dropdown.find(".tt-sticky").css("position", "absolute");
-                                var newTop = $dropdown.scrollTop() - ($(elem).outerHeight() - ($(elem).offset().top - $dropdown.offset().top));
-                                $dropdown.find(".tt-sticky").css("top", newTop + "px");
-                            }
+                            inTransition = true;
+                            if (lowestPassedElem) $dropdown.find(".tt-sticky").html($(lowestPassedElem).html());
+                            $dropdown.find(".tt-sticky").css("position", "absolute");
+                            var newTop = $dropdown.scrollTop() - ($(elem).outerHeight() - ($(elem).offset().top - $dropdown.offset().top));
+                            $dropdown.find(".tt-sticky").css("top", newTop + "px");
                         }
                     }
                 });
                 if (!lowestPassedElem) {
                     if ($dropdown.find(".tt-sticky").length) $dropdown.find(".tt-sticky").remove();
                 } else {
-                    if ($dropdown.find(".tt-sticky").length) {
-                        if ($dropdown.find(".tt-sticky").attr("data-tt-enum") != $(lowestPassedElem).attr("data-tt-enum")) {
-                            $dropdown.find(".tt-sticky").remove();
+                    if (!inTransition) {
+                        if ($dropdown.find(".tt-sticky").length) {
+                            if ($dropdown.find(".tt-sticky").attr("data-tt-enum") != $(lowestPassedElem).attr("data-tt-enum")) {
+                                $dropdown.find(".tt-sticky").remove();
+                                var newTop = $dropdown.offset().top - $(window).scrollTop();
+                                $(lowestPassedElem).clone().removeData().addClass("tt-sticky").css(css.sticky).css("position", "fixed").css("top", newTop + "px").css("width", $(lowestPassedElem).width()).appendTo($dropdown);
+                            } else {
+                                $dropdown.find(".tt-sticky").css("position", "fixed");
+                            }
+                        } else {
                             var newTop = $dropdown.offset().top - $(window).scrollTop();
                             $(lowestPassedElem).clone().removeData().addClass("tt-sticky").css(css.sticky).css("position", "fixed").css("top", newTop + "px").css("width", $(lowestPassedElem).width()).appendTo($dropdown);
-                        } else {
-                            if (!inTransition) $dropdown.find(".tt-sticky").css("position", "fixed");
                         }
-                    } else {
-                        var newTop = $dropdown.offset().top - $(window).scrollTop();
-                        $(lowestPassedElem).clone().removeData().addClass("tt-sticky").css(css.sticky).css("position", "fixed").css("top", newTop + "px").css("width", $(lowestPassedElem).width()).appendTo($dropdown);
                     }
                 }
             },
@@ -1659,6 +1668,7 @@
                 query.length >= this.minLength ? this.dropdown.update(query) : this.dropdown.empty();
                 this.dropdown.open();
                 this._setLanguageDirection();
+                this._delayedHeaderUpdate();
             },
             _onWhitespaceChanged: function onWhitespaceChanged() {
                 this._updateHint();
