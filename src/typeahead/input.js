@@ -196,8 +196,20 @@ var Input = (function() {
       return this.$input.val();
     },
 
+    getValueKey: function getValueKey() {
+      return this.$input.attr('data-value-key');
+    },
+
     setInputValue: function setInputValue(value, silent) {
       this.$input.val(value);
+
+      // silent prevents any additional events from being triggered
+      silent ? this.clearHint() : this._checkInputValue();
+    },
+
+    setValueAndKey: function setValueKey(value, valueKey, silent) {
+      this.$input.val(value);
+      this.$input.attr('data-value-key', valueKey);
 
       // silent prevents any additional events from being triggered
       silent ? this.clearHint() : this._checkInputValue();

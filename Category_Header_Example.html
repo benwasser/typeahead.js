@@ -77,36 +77,38 @@
 		};
 
 		var itemsAndSubItems = [
-			{value:'test1', category:'Category 1'},
-			{value:'test2', category:'Category 1'},
-			{value:'test3', category:'Category 1'},
-			{value:'test4', category:'Category 2'},
-			{value:'test5', category:'Category 2'},
-			{value:'test6', category:'Category 2'},
-			{value:'test7', category:'Category 2'},
-			{value:'test8', category:'Category 2'},
-			{value:'test9', category:'Category 2'},
-			{value:'test10', category:'Category 2'},
-			{value:'test11', category:'Category 2'},
-			{value:'test12', category:'Category 2'},
-			{value:'test13', category:'Category 3'},
-			{value:'test14', category:'Category 3'},
-			{value:'test15', category:'Category 3'},
-			{value:'test16', category:'Category 3'},
-			{value:'test17', category:'Category 3'},
-			{value:'test18', category:'Category 3'},
-			{value:'test19', category:'Category 3'},
-			{value:'test20', category:'Category 3'},
-			{value:'test21', category:'Category 3'},
-			{value:'test22', category:'Category 3'},
-			{value:'test23', category:'Category 3'},
-			{value:'test24', category:'Category 3'},
-			{value:'test25', category:'Category 4'},
-			{value:'test26', category:'Category 4'},
-			{value:'test27', category:'Category 4'},
-			{value:'test28', category:'Category 4'},
-			{value:'test29', category:'Category 4'},
-			{value:'test30', category:'Category 4'},
+			{id:'tttest1',  value:'test1', category:'Category 1'},
+			{id:'tttest2',  value:'test2', category:'Category 1'},
+			{id:'tttest3',  value:'test3', category:'Category 1'},
+			{id:'tttest4',  value:'test4', category:'Category 2'},
+			{id:'tttest5',  value:'test5', category:'Category 2'},
+			{id:'tttest6',  value:'test6', category:'Category 2'},
+			{id:'tttest7',  value:'test7', category:'Category 2'},
+			{id:'tttest8',  value:'test8', category:'Category 2'},
+			{id:'tttest9',  value:'test9', category:'Category 2'},
+			{id:'tttest10', value:'test10', category:'Category 2'},
+			{id:'tttest11', value:'test11', category:'Category 2'},
+			{id:'tttest12', value:'test12', category:'Category 2'},
+			{id:'tttest13', value:'test13', category:'Category 3'},
+			{id:'tttest14', value:'test14', category:'Category 3'},
+			{id:'tttest15', value:'test15', category:'Category 3'},
+			{id:'tttest16', value:'test16', category:'Category 3'},
+			{id:'tttest17', value:'test17', category:'Category 3'},
+			{id:'tttest18', value:'test18', category:'Category 3'},
+			{id:'tttest19', value:'test19', category:'Category 3'},
+			{id:'tttest20', value:'test20', category:'Category 3'},
+			{id:'tttest21', value:'test21', category:'Category 3'},
+			{id:'tttest22', value:'test22', category:'Category 3'},
+			{id:'tttest23', value:'test23', category:'Category 3'},
+			{id:'tttest24', value:'test24', category:'Category 3'},
+			{id:'tttest25', value:'test25', category:'Category 4'},
+			{id:'tttest26', value:'test26', category:'Category 4'},
+			{id:'tttest27', value:'test27', category:'Category 4'},
+			{id:'tttest28', value:'test28', category:'Category 4'},
+			{id:'tttest29', value:'test29', category:'Category 4'},
+			{id:'tttest30', value:'test30', category:'Category 4'},
+			{id:'tttest31', value:'test30', category:'Category 4'},
+			{id:'tttest32', value:'test30', category:'Category 4'},
 		];
 
 		$('#test-input-1').typeahead({
@@ -115,9 +117,16 @@
 			minLength: 0
 		},{
 			name: 'items',
+			valueKey: 'id',
 			displayKey: 'value',
 			displayCategory: 'category',
 			source: substringMatcher(itemsAndSubItems)
+		});
+
+		$('#test-input-1').typeahead('val','test30', 'tttest31');
+
+		$('#test-input-1').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+			console.log('client: ' + datum.id + ' - ' + datum.value);
 		});
 
 	</script>

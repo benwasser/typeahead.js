@@ -109,6 +109,7 @@ var Typeahead = (function() {
       var datum = this.dropdown.getDatumForCursor();
 
       this.input.setInputValue(datum.value, true);
+      this.input.setValueAndKey(datum.value, datum.raw.id, true);
 
       this.eventBus.trigger('cursorchanged', datum.raw, datum.datasetName);
     },
@@ -123,6 +124,8 @@ var Typeahead = (function() {
     },
 
     _onOpened: function onOpened() {
+      // console.log('test getInputValue: ' + this.input.getInputValue());
+      // console.log('test getvaluekey: ' + this.input.getValueKey());
       this._updateHint();
       var query = "";
       this.dropdown.isEmpty && query.length >= this.minLength ? this.dropdown.update(query) : this.dropdown.moveCursorDown();
@@ -354,7 +357,7 @@ var Typeahead = (function() {
       if (hint && query !== hint && isCursorAtEnd) {
         datum = this.dropdown.getDatumForTopSuggestion();
         datum && this.input.setInputValue(datum.value);
-
+        datum && this.input.setValueAndKey(datum.value, datum.raw.id);
         this.eventBus.trigger('autocompleted', datum.raw, datum.datasetName);
       }
     },
@@ -362,6 +365,8 @@ var Typeahead = (function() {
     _select: function select(datum) {
       this.input.setQuery(datum.value);
       this.input.setInputValue(datum.value, true);
+      this.input.setValueAndKey(datum.value, datum.raw.id, true);
+      // console.log('from _select in typeahead.js:' + datum.raw.id);
 
       this._setLanguageDirection();
 
@@ -381,6 +386,22 @@ var Typeahead = (function() {
 
     close: function close() {
       this.dropdown.close();
+    },
+
+    setValueAndKey: function setValueAndKey(val, valueKey) {
+      val = _.toStr(val);
+      valueKey = _.toStr(valueKey);
+
+      if (this.isActivated) {
+        this.input.setValueAndKey(val, valueKey, true);
+      }
+
+      else {
+        this.input.setQuery(val);
+        this.input.setValueAndKey(val, valueKey);
+      }
+
+      this._setLanguageDirection();
     },
 
     setVal: function setVal(val) {

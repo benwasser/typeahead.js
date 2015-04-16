@@ -481,8 +481,16 @@
             getInputValue: function getInputValue() {
                 return this.$input.val();
             },
+            getValueKey: function getValueKey() {
+                return this.$input.attr("data-value-key");
+            },
             setInputValue: function setInputValue(value, silent) {
                 this.$input.val(value);
+                silent ? this.clearHint() : this._checkInputValue();
+            },
+            setValueAndKey: function setValueKey(value, valueKey, silent) {
+                this.$input.val(value);
+                this.$input.attr("data-value-key", valueKey);
                 silent ? this.clearHint() : this._checkInputValue();
             },
             resetInputValue: function resetInputValue() {
@@ -934,6 +942,7 @@
             _onCursorMoved: function onCursorMoved() {
                 var datum = this.dropdown.getDatumForCursor();
                 this.input.setInputValue(datum.value, true);
+                this.input.setValueAndKey(datum.value, datum.raw.id, true);
                 this.eventBus.trigger("cursorchanged", datum.raw, datum.datasetName);
             },
             _onCursorRemoved: function onCursorRemoved() {
@@ -1106,12 +1115,14 @@
                 if (hint && query !== hint && isCursorAtEnd) {
                     datum = this.dropdown.getDatumForTopSuggestion();
                     datum && this.input.setInputValue(datum.value);
+                    datum && this.input.setValueAndKey(datum.value, datum.raw.id);
                     this.eventBus.trigger("autocompleted", datum.raw, datum.datasetName);
                 }
             },
             _select: function select(datum) {
                 this.input.setQuery(datum.value);
                 this.input.setInputValue(datum.value, true);
+                this.input.setValueAndKey(datum.value, datum.raw.id, true);
                 this._setLanguageDirection();
                 this.eventBus.trigger("selected", datum.raw, datum.datasetName);
                 this.dropdown.close();
@@ -1122,6 +1133,17 @@
             },
             close: function close() {
                 this.dropdown.close();
+            },
+            setValueAndKey: function setValueAndKey(val, valueKey) {
+                val = _.toStr(val);
+                valueKey = _.toStr(valueKey);
+                if (this.isActivated) {
+                    this.input.setValueAndKey(val, valueKey, true);
+                } else {
+                    this.input.setQuery(val);
+                    this.input.setValueAndKey(val, valueKey);
+                }
+                this._setLanguageDirection();
             },
             setVal: function setVal(val) {
                 val = _.toStr(val);
@@ -1237,18 +1259,18 @@
                     }
                 }
             },
-            val: function val(newVal) {
+            val: function val(newVal, newValueKey) {
                 return !arguments.length ? getVal(this.first()) : this.each(setVal);
                 function setVal() {
                     var $input = $(this), typeahead;
                     if (typeahead = $input.data(typeaheadKey)) {
-                        typeahead.setVal(newVal);
+                        typeahead.setValueAndKey(newVal, newValueKey);
                     }
                 }
                 function getVal($input) {
                     var typeahead, query;
                     if (typeahead = $input.data(typeaheadKey)) {
-                        query = typeahead.getVal();
+                        query = typeahead.getValueKey();
                     }
                     return query;
                 }

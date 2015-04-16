@@ -69,7 +69,7 @@
       }
     },
 
-    val: function val(newVal) {
+    val: function val(newVal, newValueKey) {
       // mirror jQuery#val functionality: reads opearte on first match,
       // write operates on all matches
       return !arguments.length ? getVal(this.first()) : this.each(setVal);
@@ -78,7 +78,7 @@
         var $input = $(this), typeahead;
 
         if (typeahead = $input.data(typeaheadKey)) {
-          typeahead.setVal(newVal);
+          typeahead.setValueAndKey(newVal, newValueKey);
         }
       }
 
@@ -86,7 +86,7 @@
         var typeahead, query;
 
         if (typeahead = $input.data(typeaheadKey)) {
-          query = typeahead.getVal();
+          query = typeahead.getValueKey();
         }
 
         return query;
