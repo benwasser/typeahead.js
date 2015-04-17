@@ -99,7 +99,6 @@ var Typeahead = (function() {
 
     _onSuggestionClicked: function onSuggestionClicked(type, $el) {
       var datum;
-
       if (datum = this.dropdown.getDatumForSuggestion($el)) {
         this._select(datum);
       }
@@ -124,8 +123,6 @@ var Typeahead = (function() {
     },
 
     _onOpened: function onOpened() {
-      // console.log('test getInputValue: ' + this.input.getInputValue());
-      // console.log('test getvaluekey: ' + this.input.getValueKey());
       this._updateHint();
       var query = "";
       this.dropdown.isEmpty && query.length >= this.minLength ? this.dropdown.update(query) : this.dropdown.moveCursorDown();
@@ -145,6 +142,7 @@ var Typeahead = (function() {
       this.isActivated = true;
       this.dropdown.open();
       this._delayedHeaderUpdate();
+      this._delayedSelectionHighlight();
     },
 
     _onBlurred: function onBlurred() {
@@ -218,6 +216,23 @@ var Typeahead = (function() {
 
     _onRightKeyed: function onRightKeyed() {
       this.dir === 'ltr' && this._autocomplete();
+    },
+    _delayedSelectionHighlight: function delayedSelectionHighlight() {
+        var that = this;
+        setTimeout(function(){
+            that._selectionHighlight();
+        }, 20);
+    },
+    _selectionHighlight: function selectionHighlight() {
+        var valueKey = this.input.getValueKey();
+        var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
+        if (valueKey || valueKey === 0) {
+          var $selectedElem = $dropdown.find('.tt-suggestion-entry[data-value-key="' + valueKey + '"]');
+          $dropdown.removeClass('tt-previously-selected');
+          $selectedElem.parent().addClass('tt-previously-selected');
+          $dropdown.scrollTop(($dropdown.scrollTop() + $selectedElem.position().top) - ($selectedElem.height() * 2) + 3); //this is not going to be exact...
+          this.dropdown._setCursor($selectedElem, true);
+        }
     },
     _delayedHeaderUpdate: function delayedHeaderUpdate() {
         var that = this;

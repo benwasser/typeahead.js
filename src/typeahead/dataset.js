@@ -219,7 +219,7 @@ var Dataset = (function() {
     };
 
     function suggestionTemplate(context) {
-      return '<p>' + displayFn(context) + '</p>';
+      return '<p class="tt-suggestion-entry" data-value-key="' + context.id + '">' + displayFn(context) + '</p>';
     }
     function categoryHeaderTemplate(name) { 
       return '<p class="tt-suggestion-category" data-tt-enum="' + _.getUniqueId() + '">' + name + "</p>"; 

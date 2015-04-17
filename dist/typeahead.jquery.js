@@ -711,7 +711,7 @@
                 }
             };
             function suggestionTemplate(context) {
-                return "<p>" + displayFn(context) + "</p>";
+                return '<p class="tt-suggestion-entry" data-value-key="' + context.id + '">' + displayFn(context) + "</p>";
             }
             function categoryHeaderTemplate(name) {
                 return '<p class="tt-suggestion-category" data-tt-enum="' + _.getUniqueId() + '">' + name + "</p>";
@@ -969,6 +969,7 @@
                 this.isActivated = true;
                 this.dropdown.open();
                 this._delayedHeaderUpdate();
+                this._delayedSelectionHighlight();
             },
             _onBlurred: function onBlurred() {
                 var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
@@ -1019,6 +1020,23 @@
             },
             _onRightKeyed: function onRightKeyed() {
                 this.dir === "ltr" && this._autocomplete();
+            },
+            _delayedSelectionHighlight: function delayedSelectionHighlight() {
+                var that = this;
+                setTimeout(function() {
+                    that._selectionHighlight();
+                }, 20);
+            },
+            _selectionHighlight: function selectionHighlight() {
+                var valueKey = this.input.getValueKey();
+                var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
+                if (valueKey || valueKey === 0) {
+                    var $selectedElem = $dropdown.find('.tt-suggestion-entry[data-value-key="' + valueKey + '"]');
+                    $dropdown.removeClass("tt-previously-selected");
+                    $selectedElem.parent().addClass("tt-previously-selected");
+                    $dropdown.scrollTop($dropdown.scrollTop() + $selectedElem.position().top - $selectedElem.height() * 2 + 3);
+                    this.dropdown._setCursor($selectedElem, true);
+                }
             },
             _delayedHeaderUpdate: function delayedHeaderUpdate() {
                 var that = this;

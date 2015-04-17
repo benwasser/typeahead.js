@@ -49,6 +49,9 @@
 		.tt-suggestion-category p {
 			margin:0px;
 		}
+		.tt-previously-selected {
+			background-color: #fff5da;
+		}
 	</style>
 </head>
 <body>
@@ -123,7 +126,7 @@
 			source: substringMatcher(itemsAndSubItems)
 		});
 
-		$('#test-input-1').typeahead('val','test30', 'tttest31');
+		$('#test-input-1').typeahead('val','test15', 'tttest15');
 
 		$('#test-input-1').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
 			console.log('client: ' + datum.id + ' - ' + datum.value);
