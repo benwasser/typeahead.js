@@ -202,12 +202,13 @@ var Input = (function() {
 
     setInputValue: function setInputValue(value, silent) {
       this.$input.val(value);
+      if (!value || value == '') this.$input.attr('data-value-key', '');
 
       // silent prevents any additional events from being triggered
       silent ? this.clearHint() : this._checkInputValue();
     },
 
-    setValueAndKey: function setValueKey(value, valueKey, silent) {
+    setValueAndKey: function setValueAndKey(value, valueKey, silent) {
       this.$input.val(value);
       this.$input.attr('data-value-key', valueKey);
 

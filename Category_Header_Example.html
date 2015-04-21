@@ -59,6 +59,7 @@
 	<div style="height:250px"></div>
 	<div style="width:140px;height:10px;display:inline-block;"></div>
 	<input id="test-input-1" type="text">
+	<input id="test-input-2" type="text">
 	<div style="height:2300px"></div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -67,7 +68,7 @@
 
 		var substringMatcher = function(items) {
 			return function findMatches(q, callback) {
-				var matches, substringRegex;
+				var matches, substrRegex;
 				matches = [];
 				substrRegex = new RegExp(q, 'i');
 				$.each(items, function(i, item) {
@@ -78,6 +79,8 @@
 				callback(matches);
 			};
 		};
+
+
 
 		var itemsAndSubItems = [
 			{id:'tttest1',  value:'test1', category:'Category 1'},
@@ -129,8 +132,33 @@
 		$('#test-input-1').typeahead('val','test15', 'tttest15');
 
 		$('#test-input-1').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
-			console.log('client: ' + datum.id + ' - ' + datum.value);
+			console.log('selected: ' + datum.value + ' - ' + datum.id);
 		});
+
+
+		$('#test-input-1').on("typeahead:closed", function(e) {
+			console.log('closed: ' + $('#test-input-1').val() + ' - ' + $('#test-input-1').attr('data-value-key'));
+		});
+
+		var itemsBloodhound = new Bloodhound({
+			datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+			queryTokenizer: Bloodhound.tokenizers.whitespace,
+			remote: 'http://localhost:8012/bloodhound?%QUERY'
+		});
+		itemsBloodhound.initialize();
+
+		$('#test-input-2').typeahead({
+			hint: true,
+			highlight: true,
+			minLength: 0
+		},{
+			name: 'items',
+			valueKey: 'id',
+			displayKey: 'value',
+			displayCategory: 'category',
+			source: itemsBloodhound.ttAdapter()
+		});
+
 
 	</script>
 </body>

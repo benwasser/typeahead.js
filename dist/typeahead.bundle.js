@@ -1084,9 +1084,10 @@
             },
             setInputValue: function setInputValue(value, silent) {
                 this.$input.val(value);
+                if (!value || value == "") this.$input.attr("data-value-key", "");
                 silent ? this.clearHint() : this._checkInputValue();
             },
-            setValueAndKey: function setValueKey(value, valueKey, silent) {
+            setValueAndKey: function setValueAndKey(value, valueKey, silent) {
                 this.$input.val(value);
                 this.$input.attr("data-value-key", valueKey);
                 silent ? this.clearHint() : this._checkInputValue();
@@ -1397,12 +1398,15 @@
                 this._ensureVisible($newCursor);
             },
             _ensureVisible: function ensureVisible($el) {
-                var elTop, elBottom, menuScrollTop, menuHeight;
+                var elTop, elBottom, menuScrollTop, menuHeight, categoryHeader;
+                if (this.$menu.find(".tt-sticky").length) categoryHeader = this.$menu.find(".tt-sticky");
                 elTop = $el.position().top;
                 elBottom = elTop + $el.outerHeight(true);
                 menuScrollTop = this.$menu.scrollTop();
                 menuHeight = this.$menu.height() + parseInt(this.$menu.css("paddingTop"), 10) + parseInt(this.$menu.css("paddingBottom"), 10);
-                if (elTop < 0) {
+                if (categoryHeader && elTop < categoryHeader.outerHeight()) {
+                    this.$menu.scrollTop(menuScrollTop + elTop - categoryHeader.outerHeight());
+                } else if (elTop < 0) {
                     this.$menu.scrollTop(menuScrollTop + elTop);
                 } else if (menuHeight < elBottom) {
                     this.$menu.scrollTop(menuScrollTop + (elBottom - menuHeight));

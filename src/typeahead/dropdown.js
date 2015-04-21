@@ -131,7 +131,9 @@ var Dropdown = (function() {
     },
 
     _ensureVisible: function ensureVisible($el) {
-      var elTop, elBottom, menuScrollTop, menuHeight;
+      var elTop, elBottom, menuScrollTop, menuHeight, categoryHeader;
+
+      if (this.$menu.find('.tt-sticky').length) categoryHeader = this.$menu.find('.tt-sticky');
 
       elTop = $el.position().top;
       elBottom = elTop + $el.outerHeight(true);
@@ -140,9 +142,12 @@ var Dropdown = (function() {
         parseInt(this.$menu.css('paddingTop'), 10) +
         parseInt(this.$menu.css('paddingBottom'), 10);
 
-      if (elTop < 0) {
+      if (categoryHeader && elTop < categoryHeader.outerHeight()) {
+        this.$menu.scrollTop(menuScrollTop + elTop - categoryHeader.outerHeight());
+      } else if (elTop < 0) {
         this.$menu.scrollTop(menuScrollTop + elTop);
       }
+
 
       else if (menuHeight < elBottom) {
         this.$menu.scrollTop(menuScrollTop + (elBottom - menuHeight));
