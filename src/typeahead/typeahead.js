@@ -228,10 +228,12 @@ var Typeahead = (function() {
         var $dropdown = this.$node ? this.$node.find(".tt-dropdown-menu") : $(this);
         if (valueKey || valueKey === 0) {
           var $selectedElem = $dropdown.find('.tt-suggestion-entry[data-value-key="' + valueKey + '"]');
-          $dropdown.removeClass('tt-previously-selected');
-          $selectedElem.parent().addClass('tt-previously-selected');
-          $dropdown.scrollTop(($dropdown.scrollTop() + $selectedElem.position().top) - ($selectedElem.height() * 2) + 3); //this is not going to be exact...
-          this.dropdown._setCursor($selectedElem, true);
+          if ($selectedElem.position()) {
+            $dropdown.removeClass('tt-previously-selected');
+            $selectedElem.parent().addClass('tt-previously-selected');
+            $dropdown.scrollTop(($dropdown.scrollTop() + $selectedElem.position().top) - ($selectedElem.height() * 2) + 3); //this is not going to be exact...
+            this.dropdown._setCursor($selectedElem, true);
+          }
         }
     },
     _delayedHeaderUpdate: function delayedHeaderUpdate() {
