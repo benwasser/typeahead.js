@@ -1084,11 +1084,13 @@
             },
             setInputValue: function setInputValue(value, silent) {
                 this.$input.val(value);
+                this.$input.attr("value", value);
                 if (!value || value == "") this.$input.attr("data-value-key", "");
                 silent ? this.clearHint() : this._checkInputValue();
             },
             setValueAndKey: function setValueAndKey(value, valueKey, silent) {
                 this.$input.val(value);
+                this.$input.attr("value", value);
                 this.$input.attr("data-value-key", valueKey);
                 silent ? this.clearHint() : this._checkInputValue();
             },
@@ -1799,7 +1801,7 @@
             $wrapper = $(html.wrapper).css(css.wrapper);
             $dropdown = $(html.dropdown).css(css.dropdown);
             $hint = $input.clone().css(css.hint).css(getBackgroundStyles($input));
-            $hint.val("").removeData().addClass("tt-hint").removeAttr("id name placeholder required").prop("readonly", true).attr({
+            $hint.val("").removeData().removeClass("required").addClass("tt-hint").removeAttr("id name placeholder required").prop("readonly", true).attr({
                 autocomplete: "off",
                 spellcheck: "false",
                 tabindex: -1

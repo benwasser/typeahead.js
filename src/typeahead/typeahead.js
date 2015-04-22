@@ -470,6 +470,7 @@ var Typeahead = (function() {
     $hint
     .val('')
     .removeData()
+    .removeClass('required')
     .addClass('tt-hint')
     .removeAttr('id name placeholder required')
     .prop('readonly', true)

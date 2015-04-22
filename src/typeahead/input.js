@@ -202,6 +202,7 @@ var Input = (function() {
 
     setInputValue: function setInputValue(value, silent) {
       this.$input.val(value);
+      this.$input.attr('value', value);
       if (!value || value == '') this.$input.attr('data-value-key', '');
 
       // silent prevents any additional events from being triggered
@@ -210,6 +211,7 @@ var Input = (function() {
 
     setValueAndKey: function setValueAndKey(value, valueKey, silent) {
       this.$input.val(value);
+      this.$input.attr('value', value);
       this.$input.attr('data-value-key', valueKey);
 
       // silent prevents any additional events from being triggered
