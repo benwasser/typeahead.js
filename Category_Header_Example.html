@@ -6,7 +6,7 @@
 	<style>
 		* { font-family: sans-serif; }
 		label { display: block; font-weight: bold; color: #505050; margin: 3px; }
-		input { border: 1px solid #ddd; border-radius: 2px; height: 20px; width: 250px; text-indent: 4px; }
+		input { border: 1px solid #ddd; border-radius: 2px; height: 20px; width: 350px; text-indent: 4px; }
 		small { color: #c1c1c1; }
 		@-ms-viewport {
 			width: device-width;
@@ -56,10 +56,20 @@
 </head>
 <body>
 	<div id="console"></div>
-	<div style="height:250px"></div>
-	<div style="width:140px;height:10px;display:inline-block;"></div>
+	<div style="height:50px"></div>
+	<!-- <div style="width:140px;height:10px;display:inline-block;"></div> -->
+	Local:<br />
 	<input id="test-input-1" type="text">
+
+	<br /><br />
+	Remote:<br />
 	<input id="test-input-2" type="text">
+	<br />
+	<br />
+	<input id="autofill-input-1" type="text"><br />
+	<input id="autofill-input-2" type="text">
+
+
 	<div style="height:2300px"></div>
 
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -150,7 +160,12 @@
 		$('#test-input-2').typeahead({
 			hint: true,
 			highlight: true,
-			minLength: 0
+			minLength: 0,
+			templates: {
+				suggestion: function(context) {
+					return '<p class="tt-suggestion-entry" data-value-key="' + context.id + '">' + context.value + ' - ' + (context.arbitrary1 || '') + ' - ' + (context.arbitrary2 || '') + '</p>';
+				},
+			},
 		},{
 			name: 'items',
 			valueKey: 'id',
@@ -159,6 +174,12 @@
 			source: itemsBloodhound.ttAdapter()
 		});
 
+
+		$('#test-input-2').on("typeahead:selected typeahead:autocompleted", function(e,datum) {
+			console.dir(datum);
+			if (datum.arbitrary1) $('#autofill-input-1').val(datum.arbitrary1);
+			if (datum.arbitrary2) $('#autofill-input-2').val(datum.arbitrary2);
+		});
 
 	</script>
 </body>

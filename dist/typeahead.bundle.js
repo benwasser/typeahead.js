@@ -1492,6 +1492,11 @@
             if (!o.input) {
                 $.error("missing input");
             }
+            if (o.templates) {
+                for (var i = 0; i < o.datasets.length; i++) {
+                    o.datasets[i].templates = o.templates;
+                }
+            }
             this.isActivated = false;
             this.autoselect = !!o.autoselect;
             this.minLength = _.isNumber(o.minLength) ? o.minLength : 1;
@@ -1858,7 +1863,8 @@
                         withHint: _.isUndefined(o.hint) ? true : !!o.hint,
                         minLength: o.minLength,
                         autoselect: o.autoselect,
-                        datasets: datasets
+                        datasets: datasets,
+                        templates: o.templates || {}
                     });
                     $input.data(typeaheadKey, typeahead);
                 }
